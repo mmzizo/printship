@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html  class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% if title %}
+  <title>PrintShip-{{title}}</title>
+  {% else %}
+  <title>PrintShip</title>
+  {% endif %}
+
+  <link rel = "icon" href ="{{url_for('static',filename ='brand.png')}}" type = "image/x-icon">
+  <link rel="stylesheet" href="{{url_for('static',filename ='css/cyborg.css')}}" id="theme-link">
+  <link rel="stylesheet" href="{{url_for('static',filename ='style.css')}}">
+  
+</head>
+
+<body id="bdy">
+  <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation" height="100">
+    <div class="navbar-brand">
+      <a class="navbar-item " href="{{url_for('home')}}">
+        <img src="{{url_for('static',filename ='brand.png')}}" width="112" height="28">
+      </a>
+
+      <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false"
+        data-target="navbarBasicExample">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="{{url_for('home')}}">
+          Home
+        </a>
+
+        <a class="navbar-item" href="{{url_for('new_post')}}">
+          +New
+        </a>
+        <a class="navbar-item"href="{{url_for('about')}}">
+          About
+        </a>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            More
+          </a>
+
+          <div class="navbar-dropdown">
+            <a class="navbar-item">
+              Jobs
+            </a>
+            <a class="navbar-item">
+              Contact
+            </a>
+            <hr class="navbar-divider">
+            <a class="navbar-item">
+              Report an issue
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          {% if current_user.is_authenticated %}
+          <div class="buttons">
+            <a class="button is-primary" href="{{url_for('account')}}">
+              <strong>{{current_user.username}}</strong>
+            </a>
+            <a class="button is-light" href="{{url_for('logout')}}">
+              Logout
+            </a>
+          </div>
+            
+          {% else %}
+          <div class="buttons">
+            <a class="button is-primary" href="{{url_for('register')}}">
+              <strong>Sign up</strong>
+            </a>
+            <a class="button is-light" href="{{url_for('login')}}">
+              Login
+            </a>
+          </div>
+            
+          {% endif %}
+         
+        </div>
+      </div>
+    </div>
+  </nav>
+  {% with messages = get_flashed_messages(with_categories=true)%}
+  {% if messages %}
+  {% for catagory,message in messages %}
+  <div class="notification is-{{catagory}}">
+    {{message}}
+  </div>
+
+  {% endfor %}
+
+  {% endif %}
+
+  {% endwith %}
+  <section class="section columns">
+    <div class="column is-one-fifth ">
+      <article class="panel is-primary " style="position: sticky; margin: 15px 15px 5px 5px; ">
+        <p class="panel-heading">
+          Explore
+        </p>
+        <div class="panel-block">
+          <form action="{{url_for('home')}}" target="{{url_for('home')}}" method="GET">
+          <div class="field has-addons">
+            <div class="control">
+              <input class="input" type="Search" placeholder="Find a repository" name="q">
+            </div>
+            <div class="control">
+              <button class="button is-info" type="submit"><i class="fas fa-search"></i></button>
+            </div>
+          </div>
+        </form>
+        </div>
+        <a class="panel-block " href="{{url_for('home')}}">
+          <span class="panel-icon">
+            <i class="fas fa-hashtag" aria-hidden="true"></i>
+          </span>
+          Most Recent
+        </a>
+        <a class="panel-block" href="{{url_for('categorie',category='Music')}}">
+          <span class="panel-icon">
+            <i class="fas fa-hashtag" aria-hidden="true"></i>
+          </span>
+          Music
+        </a>
+      <a class="panel-block" href="{{url_for('categorie',category='Movies')}}">
+        <span class="panel-icon">
+          <i class="fas fa-hashtag" ></i>
+        </span>
+        Movies
+      </a>
+      <a class="panel-block" href="{{url_for('categorie',category='-series')}}">
+        <span class="panel-icon">
+          <i class="fas fa-hashtag" ></i>
+        </span>
+        TV-series
+      </a>
+      <a class="panel-block" href="{{url_for('categorie',category='Anime')}}">
+        <span class="panel-icon">
+          <i class="fas fa-hashtag" ></i>
+        </span>
+        Anime
+      </a>
+
+
+      <a class="panel-block">
+        <div id="darkmode">
+          <button class="button is-rounded is-fullwidth" id="darkmodebtn" onclick="checkmode()">Dark Mode</button>
+        </div>
+      </a>
+    </article>
+    </div>
+    <div class="container mx-0 columns is-multiline is-three-quarters">
+      {% block content %}
+
+      {% endblock content %}
+
+    </div>
+  </section>
+
+</body>
+<script src="{{url_for('static',filename ='main.js')}}"></script>
+<script defer src="https://use.fontawesome.com/releases/v5.14.0/js/all.js"></script>
+</html>

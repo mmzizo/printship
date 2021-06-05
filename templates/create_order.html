@@ -1,0 +1,94 @@
+{% extends 'layout.html' %}
+{% block content %}
+<Div class="container mx-4 columns is-2 is-multiline is-three-quarters">
+    <div class="column   is-two-thirds">
+      <figure class="image is-4by3">
+        <img src="{{url_for('static', filename='design_pics/' + post.image_file)}}" alt="Placeholder image">
+      </figure>
+    </div>
+    <div class="column  is-one-third">
+      <div class="box">
+    <form action="" method="POST">
+            {{ form.hidden_tag() }}
+
+        <div class="field">
+          <label class="label">Print on</label>
+          <div class="control">
+            {{form.material(class="select")}}
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Size</label>
+          <div class="control">
+            {{form.size(class="select")}}
+          </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Quantity</label>
+            <div class="control">
+              {{form.qty(class="select")}}
+            </div>
+          </div>
+
+        <div class="field">
+          <label class="label">Name</label>
+          <div class="control">
+            {% if form.name.errors  %}
+            {{form.name(class="input is-danger",placeholder="name")}}
+            {% for error in form.name.errors %}
+            <p class="help is-danger">{{error}}</p>
+            {% endfor %}  
+            {% else %}
+            {{form.name(class="input",placeholder="name")}}
+            {% endif %}
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">phone Number</label>
+          <div class="control">
+           {% if form.phone.errors %}
+          {{form.phone(class="input is-danger",placeholder="Phone Number")}}
+          </span>  
+          {% for error in form.phone.errors %}
+          <p class="help is-danger">{{error}}</p>
+          {% endfor %} 
+            
+          {% else %}
+          {{form.phone(class="input",placeholder="Phone Number")}}
+          {% endif %}
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">color</label>
+          <div class="control">
+            {{form.color(class="select")}}
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Detailed Address</label>
+          {% if form.location.errors %}
+          {{form.location(class="input is-danger",placeholder="location Number")}}
+          </span>  
+          {% for error in form.location.errors %}
+          <p class="help is-danger">{{error}}</p>
+          {% endfor %} 
+            
+          {% else %}
+          {{form.location(class="input",placeholder="location Number")}}
+          {% endif %}
+        </div>
+
+        <div>
+          <div class="field">
+          <div class="control">
+            {{form.submit(class="button is-fullwidth is-success")}}
+          </div>
+        </div>
+
+    </form>
+      </div>
+    </div>
+  </Div>
+{% endblock content %}

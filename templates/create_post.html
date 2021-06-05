@@ -1,0 +1,158 @@
+{% extends 'layout.html' %}
+{% block content %}
+{% if post %}
+<div class="column ">
+  <div class="card">
+  <figure class="image is-4by3">
+    <img src="{{url_for('static', filename='design_pics/' + post.image_file)}}" alt="Placeholder image">
+  </figure>
+  <div class="media-content m-1">
+    <a class="title is-5" href="{{url_for('post',post_id=post.id)}}">{{post.title}}</a><br>
+  </div>
+  <div class="content m-1">
+    {{post.caption}}
+    <br>
+    <time datetime="">{{post.date_posted.strftime('%d %b , %H:%M')}}</time>
+  </div>
+</div>
+</div>  
+{% endif %}
+<div class="container box" style="margin: 25px 50px;">
+  <form action="" method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="media ">
+      <div class="is-size-4 has-text-centered"> <b>{{legend}}</b></div>
+    </div>
+<div class="content">
+  <div class="field">
+    <p class="control has-icons-left has-icons-right">
+      {% if form.title.errors  %}
+      {{form.title(class="input is-danger",placeholder="title")}}
+      {% for error in form.title.errors %}
+      <p class="help is-danger">{{error}}</p>
+      {% endfor %}
+      {% else %}
+      {{form.title(class="input",placeholder="title")}}
+      {% endif %}
+    </p>
+  </div>
+  <div class="field">
+    <p class="control has-icons-left has-icons-right">
+      {% if form.caption.errors %}
+      {{form.caption(class="input is-danger",placeholder="Description")}}
+      {% for error in form.caption.errors %}
+      <p class="help is-danger">{{error}}</p>
+      {% endfor %}
+
+      {% else %}
+      {{form.caption(class="input",placeholder="Description")}}
+      {% endif %}
+    </p>
+  </div>
+  {% if form.dfile.errors %}
+  <div id="file-js-example" class="file is-info has-name field">
+    <label class="file-label">
+      {{form.dfile(class="file-input",type="file")}}
+      <span class="file-cta">
+        <span class="file-icon">
+          <i class="fas fa-upload"></i>
+        </span>
+        <span class="file-label">
+          {{form.dfile.label}}
+        </span>
+      </span>
+      <span class="file-name">
+        Actual design file
+      </span>
+    </label>
+  </div>
+  {% for error in form.dfile.errors %}
+  <p class="help is-danger">{{error}}</p>
+  {% endfor %}
+
+  {% else %}
+  <div id="file-js-example" class="file is-info has-name field">
+    <label class="file-label">
+      {{form.dfile(class="file-input",type="file")}}
+      <span class="file-cta">
+        <span class="file-icon">
+          <i class="fas fa-upload"></i>
+        </span>
+        <span class="file-label">
+          {{form.dfile.label}}
+        </span>
+      </span>
+      <span class="file-name">
+        Actual design file
+      </span>
+    </label>
+  </div>
+  {% endif %}
+</div>
+
+{% if form.picture.errors %}
+<div id="thumb-js-example" class="file is-info has-name field">
+  <label class="file-label">
+    {{form.picture(class="file-input",type="file")}}
+    <span class="file-cta">
+      <span class="file-icon">
+        <i class="fas fa-upload"></i>
+      </span>
+      <span class="file-label">
+        {{form.picture.label}}
+      </span>
+    </span>
+    <span class="file-name">
+      Thumbnail
+    </span>
+  </label>
+</div>
+{% for error in form.picture.errors %}
+<p class="help is-danger">{{error}}</p>
+{% endfor %}
+
+{% else %}
+<div id="thumb-js-example" class="file is-info has-name field">
+  <label class="file-label">
+    {{form.picture(class="file-input",type="file")}}
+    <span class="file-cta">
+      <span class="file-icon">
+        <i class="fas fa-upload"></i>
+      </span>
+      <span class="file-label">
+        {{form.picture.label}}
+      </span>
+    </span>
+    <span class="file-name">
+      thumbnail
+    </span>
+  </label>
+</div>
+{% endif %}
+<div class="field">
+  {{form.submit(class="button is-fullwidth is-success")}}
+</div>
+</div>
+</form>
+</div>
+
+
+
+<script>
+  const fileInput = document.querySelector('#file-js-example input[type=file]');
+  fileInput.onchange = () => {
+    if (fileInput.files.length > 0) {
+      const fileName = document.querySelector('#file-js-example .file-name');
+      fileName.textContent = fileInput.files[0].name;
+    }
+  }
+  const thumbInput = document.querySelector('#thumb-js-example input[type=file]');
+  thumbInput.onchange = () => {
+    if (thumbInput.files.length > 0) {
+      const fileName = document.querySelector('#thumb-js-example .file-name');
+      fileName.textContent = thumbInput.files[0].name;
+    }
+  }
+</script>
+
+{% endblock content %}

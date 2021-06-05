@@ -1,0 +1,148 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="card column  is-one-third">
+    <div class="card-image">
+      <figure class="image">
+        <img src="{{image_file}}" alt="Placeholder image">
+      </figure>
+    </div>
+    <div class="card-content">
+      <div class="media">
+        <div class="media-content">
+          <p class="title is-4">{{current_user.username}}</p>
+          <p class="subtitle is-7">{{current_user.email}}</p>
+        </div>
+      </div>
+  
+      <div class="content">
+        user data 
+      </div>
+    </div>
+    <footer class="card-footer">
+      <a href="#" class="card-footer-item">Like</a>
+      <a href="#" class="card-footer-item">Buy</a>
+    </footer>
+  </div>
+  <div class="container box" style="margin: 25px 50px;">
+    <form action="" method="POST" enctype="multipart/form-data">
+      {{ form.hidden_tag() }}
+      <div class="media ">
+        <div class="is-size-4 has-text-centered"> <b>Account</b> Update info </div>
+      </div>
+  
+      <div class="content">
+        <div class="field">
+          <p class="control has-icons-left has-icons-right">
+            {% if form.email.errors %}
+            {{form.email(class="input is-danger",placeholder="Email")}}
+            <span class="icon is-small is-left">
+              <i class="fas fa-envelope"></i>
+            </span>
+            {% for error in form.email.errors %}
+            <p class="help is-danger">{{error}}</p>
+            {% endfor %}  
+            {% else %}
+            {{form.email(class="input",placeholder="Email")}}
+            <span class="icon is-small is-left">
+              <i class="fas fa-envelope"></i>
+            </span>
+            {% endif %}
+          </p>
+        </div>
+        <div class="field">
+          <p class="control has-icons-left has-icons-right">
+            {% if form.username.errors  %}
+            {{form.username(class="input is-danger",placeholder="Username")}}
+            <span class="icon is-small is-left">
+              <i class="fas fa-user"></i>
+            </span>
+            {% for error in form.username.errors %}
+            <p class="help is-danger">{{error}}</p>
+            {% endfor %}  
+            {% else %}
+            {{form.username(class="input",placeholder="Username")}}
+            <span class="icon is-small is-left">
+              <i class="fas fa-user"></i>
+            </span>
+              
+            {% endif %}
+           
+          </p>
+        </div>
+        <div class="field">
+          <p class="control has-icons-left has-icons-right">
+            {% if form.phone.errors %}
+            {{form.phone(class="input is-danger",placeholder="Phone Number")}}
+            <span class="icon is-small is-left">
+              <i class="fas fa-phone"></i>
+            </span>  
+            {% for error in form.phone.errors %}
+            <p class="help is-danger">{{error}}</p>
+            {% endfor %} 
+              
+            {% else %}
+            {{form.phone(class="input",placeholder="Phone Number")}}
+            <span class="icon is-small is-left">
+              <i class="fas fa-phone"></i>
+            </span>  
+            {% endif %}
+          </p>
+        </div>
+            {% if form.picture.errors %}
+            <div id="file-js-example" class="file is-info has-name field">
+            <label class="file-label">
+            {{form.picture(class="file-input",type="file")}}   
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">
+                {{form.picture.label}}
+              </span>
+            </span>
+            <span class="file-name">
+              No file uploaded
+            </span>
+          </label>
+          </div>
+            {% for error in form.picture.errors %}
+            <p class="help is-danger">{{error}}</p>
+            {% endfor %}
+              
+            {% else %}
+            <div id="file-js-example" class="file is-info has-name field">
+            <label class="file-label">
+            {{form.picture(class="file-input",type="file")}}   
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">
+                {{form.picture.label}}
+              </span>
+            </span>
+            <span class="file-name">
+              No file uploaded
+            </span>
+          </label> 
+          </div> 
+            {% endif %}
+            
+          
+        </div>
+        <div class="field">
+          {{form.submit(class="button is-fullwidth is-success")}}
+        </div>
+      </div>
+    </form>
+  </div> 
+  <script>
+    const fileInput = document.querySelector('#file-js-example input[type=file]');
+    fileInput.onchange = () => {
+      if (fileInput.files.length > 0) {
+        const fileName = document.querySelector('#file-js-example .file-name');
+        fileName.textContent = fileInput.files[0].name;
+      }
+    }
+  </script> 
+{% endblock content %}

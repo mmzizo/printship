@@ -1,0 +1,34 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container is-full">
+    <article class="message is-info">
+        <div class="message-header">
+            <p>Share Now!</p>
+        </div>
+        <div class="message-body">
+            
+            <p class="is-size-1">{{post.title}}</p>
+            <p class="is-size-6">{{post.caption}}</p>
+            
+        </div>
+      </article>
+</div>
+<div class="block column is-full ">
+    <a class="button is-link is-rounded is-fullwidth is-outlined block" href="https://www.facebook.com/sharer.php?u={{url_for('order_post',post_id=post.id)}}">
+        <span class="icon">
+            <i class="fab fa-facebook-square "></i>
+        </span><span> facebook</span></a>
+    <a class="button is-info is-rounded is-fullwidth is-outlined block" href="https://twitter.com/share?url={{url_for('order_post',post_id=post.id)}}&text={{post.title}}">
+        <span class="icon">
+        <i class="fab fa-twitter"></i>
+        </span><span> twitter</span></a>
+    <a class="button is-success is-rounded is-fullwidth is-outlined block" href="https://api.whatsapp.com/send?text={{post.title}} {{url_for('order_post',post_id=post.id)}}">
+        <span class="icon">
+            <i class="fab fa-whatsapp-square"></i>
+        </span><span> whats app</span></a>
+
+</div>
+
+{% endblock content %}
+
+
