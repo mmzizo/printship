@@ -59,6 +59,21 @@
           {% endif %}
           </div>
         </div>
+        <div class="field">
+          <label class="label">second phone Number</label>
+          <div class="control">
+           {% if form.phone2.errors %}
+          {{form.phone2(class="input is-danger",placeholder="Phone Number")}}
+          </span>  
+          {% for error in form.phone2.errors %}
+          <p class="help is-danger">{{error}}</p>
+          {% endfor %} 
+            
+          {% else %}
+          {{form.phone(class="input",placeholder="Phone Number")}}
+          {% endif %}
+          </div>
+        </div>
 
         <div class="field">
           <label class="label">color</label>

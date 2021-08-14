@@ -15,13 +15,9 @@
       </div>
   
       <div class="content">
-        user data 
+        {{current_user.bio}}
       </div>
     </div>
-    <footer class="card-footer">
-      <a href="#" class="card-footer-item">Like</a>
-      <a href="#" class="card-footer-item">Buy</a>
-    </footer>
   </div>
   <div class="container box" style="margin: 25px 50px;">
     <form action="" method="POST" enctype="multipart/form-data">
@@ -67,6 +63,19 @@
               
             {% endif %}
            
+          </p>
+        </div>
+        <div class="field">
+          <p class="control has-icons-left has-icons-right">
+            {% if form.bio.errors %}
+            {{form.bio(class="input is-danger",placeholder="bio")}}
+            {% for error in form.bio.errors %}
+            <p class="help is-danger">{{error}}</p>
+            {% endfor %}
+      
+            {% else %}
+            {{form.bio(class="input",placeholder="bio")}}
+            {% endif %}
           </p>
         </div>
         <div class="field">

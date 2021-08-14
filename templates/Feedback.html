@@ -33,11 +33,6 @@
             {{post.caption}}
             <br>
             <time datetime="">{{post.date_posted.strftime('%d %b , %H:%M')}}</time>
-            <br>
-            {% if post.scorecount>0 %}
-            <p>Ratings : {{post.scoresum/post.scorecount}} % ({{post.scorecount}})</p>
-            {% endif %}
-            <p>total orders {{orders.total}}</p>
         </div>
     </div>
     <footer class="card-footer">
@@ -48,56 +43,46 @@
         <a href="{{url_for('order_post',post_id=post.id)}}" class="card-footer-item">
             <span class="icon">
                 <i class="fas fa-cart-plus"></i>
-            </span> Order</a>
-        <a href="{{url_for('feedback_post',post_id=post.id)}}" class="card-footer-item">
-            <span class="icon">
-                <i class="fa fa-percent" aria-hidden="true"></i>
-            </span> Feedback</a>
+            </span> Order now</a>
     </footer>
 </div>
-
-<div class="box column is-two-third">
-    <div class="columns is-multiline">
-
-        {% for gallery in gallery.items %}
-        <div class="column is-one-third">
-            <figure class="image ">
-                <img src="{{url_for('static', filename='design_pics/' + gallery.ig)}}" alt="Placeholder image">
-            </figure>
-        </div>
-        {% endfor %}
-
-
-    </div>
+<div class="box column is-two-thirds">
+    <form action="" method="POST">
+        {{ form.hidden_tag() }}
+        <div class="field">
+            <label class="label">Rating score</label>
+            <div class="control">
+              {% if form.score.errors  %}
+              {{form.score(class="input is-danger",placeholder="score")}}
+              {% for error in form.score.errors %}
+              <p class="help is-danger">{{error}}</p>
+              {% endfor %}  
+              {% else %}
+              {{form.score(class="input",placeholder="score")}}
+              {% endif %}
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Feedback</label>
+            <div class="control">
+              {% if form.cont.errors  %}
+              {{form.cont(class="input is-danger",placeholder="Feedback")}}
+              {% for error in form.cont.errors %}
+              <p class="help is-danger">{{error}}</p>
+              {% endfor %}  
+              {% else %}
+              {{form.cont(class="input",placeholder="Feedback")}}
+              {% endif %}
+            </div>
+          </div>
+          <div>
+            <div class="field">
+            <div class="control">
+              {{form.submit(class="button is-fullwidth is-success")}}
+            </div>
+          </div>
+    </form>
 </div>
-
-    {% for feedback in feedback.items %}
-    <div class="card column is-full mt-1">
-        <div class="card-content">
-            <div class="media">
-                <div class="media-left">
-                    <figure class="image is-rounded is-48x48">
-                        <img class="is-rounded"
-                            src="{{ url_for('static', filename='profile_pics/' + feedback.critic.image_file)}}"
-                            alt="Placeholder image">
-                    </figure>
-                </div>
-                <div class="media-content">
-                    <a class="subtitle is-6"
-                        href="{{url_for('user_posts', username=feedback.critic.username)}}">@{{feedback.critic.username}}</a><br>
-                </div>
-            </div>
-            <div class="content">
-                <p>{{feedback.cont}}</p>
-                <p>{{feedback.score}} %</p>
-
-            </div>
-        </div>
-    </div>
-
-        
-    {% endfor %}
-
 
 
 <div class="modal" id="myModal">

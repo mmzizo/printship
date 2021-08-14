@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField , FileAllowed
 from flask_login import current_user
-from wtforms import StringField , PasswordField , SubmitField ,BooleanField ,TextAreaField ,SelectField ,IntegerField
-from wtforms.validators import DataRequired , Length , Email , EqualTo , ValidationError
+from wtforms import StringField , PasswordField , SubmitField ,BooleanField ,TextAreaField ,SelectField ,IntegerField, MultipleFileField
+from wtforms.validators import DataRequired , Length , Email , EqualTo , ValidationError ,NumberRange
 from App.models import User
 
 class RegisterationForm(FlaskForm):
@@ -38,6 +38,7 @@ class UpdateAccountForm(FlaskForm):
     phone = StringField('Phone Number' , validators=[DataRequired(),Length(min=11,max=11)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     picture = FileField('Update Picture', validators=[FileAllowed(['png','jpg'])])
+    bio = TextAreaField('User Bio', validators=[DataRequired() ,Length(min=5,max=240)])
     submit = SubmitField('Update')
 
     def validate_username(self , username):
@@ -67,11 +68,21 @@ class OrderForm(FlaskForm):
     name = StringField('Name' , validators=[DataRequired(),Length(min=2,max=40)])
     location = TextAreaField('Address', validators=[DataRequired() ,Length(min=5,max=240)])
     phone = StringField('Phone Number' , validators=[DataRequired(),Length(min=11,max=11)])
+    phone2 = StringField('Phone Number' , validators=[DataRequired(),Length(min=11,max=11)])
     material = SelectField(u'Material', choices=['Mug 50 LE','T-shirt 200LE','hoodi 300LE'])
     size = SelectField(u'Size', choices=['S','M','L','XL','XXL','XXXL'])
     color = SelectField(u'color', choices=['black','white','blue','green','red'])
     qty = IntegerField('QTY', validators=[DataRequired()] )
     submit = SubmitField('Order')
+
+class GalleryForm(FlaskForm):
+    ig = MultipleFileField('Images', validators=[DataRequired() ,FileAllowed(['png','jpg','jpeg'])])
+    submit = SubmitField('Add')
+
+class FeedbackForm(FlaskForm):
+    score = IntegerField('QTY', validators=[DataRequired(),NumberRange(min=5,max=100)] )
+    cont = TextAreaField('Feedback section', validators=[DataRequired() ,Length(min=5,max=350)])
+    submit = SubmitField('submit')
 
 
 class RequestResetForm(FlaskForm):
