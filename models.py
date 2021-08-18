@@ -19,9 +19,13 @@ class User (db.Model , UserMixin):
     email = db.Column(db.String(120) ,unique=True , nullable=False)
     phone = db.Column(db.String(120) ,unique=True , nullable=False)
     image_file = db.Column(db.String(20) , nullable=False, default='default.jpg')
+    bio = db.Column(db.String(250) ,nullable=False,default='new account')
     password = db.Column(db.String(60) , nullable= False)
+    balance = db.Column(db.Integer ,nullable=False)
     posts = db.relationship('Post', backref='author',lazy=True)
+    cash = db.relationship('Cashout', backref='applicant',lazy=True)
     order = db.relationship('Order', backref='owner',lazy=True)
+    feedback = db.relationship('Feedback', backref='critic',lazy=True)
 
     def get_reset_token(self, expires_sec=900):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
@@ -48,7 +52,11 @@ class Post (db.Model):
     image_file = db.Column(db.String(20) , nullable=False, default='defdesign.jpg')
     dfile = db.Column(db.String(20) , nullable=False, default='defdesign.jpg')
     user_id = db.Column(db.Integer , db.ForeignKey('user.id'),nullable=False)
+    scorecount = db.Column(db.Integer ,nullable=False,default = 0)
+    scoresum = db.Column(db.Integer ,nullable=False,default = 0)
     order = db.relationship('Order', backref='product',lazy=True)
+    gallery = db.relationship('Gallery', backref='product',lazy=True)
+    feedback = db.relationship('Feedback', backref='rate',lazy=True)
     def __repr__(self):
         return f"Post '{self.title}','{self.date_posted}'"
 
@@ -59,36 +67,37 @@ class Order (db.Model):
     name = db.Column(db.String(70) ,nullable=False)
     address = db.Column(db.String(150) ,nullable=False)
     phone = db.Column(db.String(70) ,nullable=False)
+    phone2 = db.Column(db.String(70) ,nullable=False)
     color = db.Column(db.String(20) ,nullable=False)
     qty = db.Column(db.Integer ,nullable=False)
+    cash = db.Column(db.Integer ,nullable=False)
+    status = db.Column(db.String(20) ,nullable=False)
     date_ordered =db.Column(db.DateTime ,nullable=False,default=datetime.utcnow)
+    date_shipped =db.Column(db.DateTime ,nullable=True)
+    date_recieved =db.Column(db.DateTime ,nullable=True)
     user_id = db.Column(db.Integer , db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer , db.ForeignKey('post.id'))
     def __repr__(self):
         return f"Post '{self.title}','{self.date_posted}'"
 
-adlo = User.query.filter_by(id=1).first()
-class LogModelView(ModelView):
+class Gallery(db.Model):
+    id = db.Column(db.Integer , primary_key=True)
+    ig = db.Column(db.String(20) , nullable=False, default='g1.jpg')
+    post_id = db.Column(db.Integer , db.ForeignKey('post.id'))
 
-    def is_accessible(self):
-        return current_user == adlo
+class Cashout(db.Model):
+    id = db.Column(db.Integer , primary_key=True)
+    requested_cash = db.Column(db.Integer ,nullable=False)
+    user_id = db.Column(db.Integer , db.ForeignKey('user.id'))
+    
 
-    def inaccessible_callback(self, name, **kwargs):
-        # redirect to login page if user doesn't have access
-        return redirect(url_for('login', next=request.url))
+class Feedback(db.Model):
+    id = db.Column(db.Integer , primary_key=True)
+    cont = db.Column(db.String(250) ,nullable=False,index=True)
+    score = db.Column(db.Integer ,nullable=False)
+    user_id = db.Column(db.Integer , db.ForeignKey('user.id'))
+    post_id = db.Column(db.Integer , db.ForeignKey('post.id'))
 
-class LogAdminIndexView(AdminIndexView):
-
-    def is_accessible(self):
-        return current_user == adlo
-
-    def inaccessible_callback(self, name, **kwargs):
-        # redirect to login page if user doesn't have access
-        return redirect(url_for('login', next=request.url))
-
-path = op.join(op.dirname(__file__), 'static')
-admin = Admin(app,index_view=LogAdminIndexView(), template_mode='bootstrap3')
-admin.add_view(FileAdmin(path, '/static/', name='Static Files'))
 
 """ from flask import Flask
 from flask import send_file
@@ -99,6 +108,3 @@ def downloadFile ():
     return send_file(path, as_attachment=True)
  """ 
 
-admin.add_view(LogModelView(User, db.session))
-admin.add_view(LogModelView(Post, db.session))
-admin.add_view(LogModelView(Order, db.session))

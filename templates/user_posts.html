@@ -17,6 +17,10 @@
         <a class="subtitle is-7"
           >{{user.email}}</a>
       </div>
+     
+    </div>
+    <div class="content">
+      {{current_user.bio}}
     </div>
   </div>
 </div>
@@ -43,8 +47,14 @@
     </div>
 
     <div class="content">
-      {{post.caption}}
+      <div style="display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+       overflow: hidden;"> {{post.caption}} </div>
       <br>
+      {% if post.scorecount>0 %}
+      <p>Ratings : {{post.scoresum/post.scorecount}} % ({{post.scorecount}})</p>
+      {% endif %}
       <time datetime="">{{post.date_posted.strftime('%d %b , %H:%M')}}</time>
     </div>
 

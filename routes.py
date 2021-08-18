@@ -3,8 +3,8 @@ import secrets
 from PIL import Image
 from flask import render_template,url_for,flash,redirect,request ,abort
 from App import app ,db,bcrypt ,mail 
-from App.forms import RegisterationForm, LoginForm ,UpdateAccountForm ,PostForm ,OrderForm ,RequestResetForm, ResetPasswordForm
-from App.models import User , Post ,Order
+from App.forms import RegisterationForm, LoginForm ,UpdateAccountForm ,PostForm ,OrderForm ,RequestResetForm, ResetPasswordForm ,GalleryForm ,FeedbackForm
+from App.models import Feedback, User , Post ,Order ,Gallery
 from flask_login import login_user ,current_user , login_required , logout_user
 from flask_mail import Message
 
@@ -27,11 +27,24 @@ def categorie(category):
     page= request.args.get('page',1,type=int)
     posts=Post.query.filter(Post.caption.contains(c)).paginate(page=page ,per_page=18)
     return render_template('home.html',posts=posts)
-
+@app.route('/toprate')
+def toprate():
+    page= request.args.get('page',1,type=int)
+    posts=Post.query.order_by(Post.scoresum.desc()).paginate(page=page,per_page=18)
+    return render_template('home.html',posts=posts)
 
 @app.route('/about')
 def about():
     return render_template('about.html',title='About')
+
+@app.route('/dash')
+@login_required
+def dash():
+    if current_user.id < 2:
+         return render_template('orderadmin.html',title='dashboard')
+    abort(403)
+
+    
 
 @app.route('/register',methods =['GET','POST'])
 def register():
@@ -66,31 +79,28 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('home'))
-def save_picture(form_picture):
-    random_hex= secrets.token_hex(8)
+def save_picture(form_picture,code):
     f_name , f_ext = os.path.splitext(form_picture.filename)
-    picture_fn= random_hex + f_ext
+    picture_fn= code + f_ext
     picture_path = os.path.join(app.root_path,'static/profile_pics',picture_fn)
     output_size = (480,480)
     i =Image.open(form_picture)
-    i.thumbnail(output_size,resample=3)
+    i.thumbnail(output_size)
     i.save(picture_path)
     return picture_fn
-def save_design(form_picture):
-    random_hex= secrets.token_hex(8)
+def save_design(form_picture,code):
     f_name , f_ext = os.path.splitext(form_picture.filename)
-    picture_fn= random_hex + f_ext
+    picture_fn= code + f_ext
     picture_path = os.path.join(app.root_path,'static/design_pics',picture_fn)
     output_size = (1280,960)
     i =Image.open(form_picture)
-    i.thumbnail(output_size,resample=3)
+    i.thumbnail(output_size)
     i.save(picture_path)
     return picture_fn 
 
-def save_file(d_file):
-    random_hex= secrets.token_hex(8)
+def save_file(d_file,code):
     f_name , f_ext = os.path.splitext(d_file.filename)
-    d_fn = random_hex + f_ext
+    d_fn = code + f_ext
     d_path  = os.path.join(app.root_path,'static/design_files',d_fn)
     d_file.save(d_path)
     return d_fn
@@ -114,12 +124,13 @@ def account():
     form = UpdateAccountForm()
     if form.validate_on_submit():
         if form.picture.data:
-            picture_file= save_picture(form.picture.data)
+            picture_file= save_picture(form.picture.data,current_user.id)
             current_user.image_file = picture_file
 
         current_user.username = form.username.data
         current_user.email = form.email.data
         current_user.phone = form.phone.data
+        current_user.bio = form.bio.data
         db.session.commit()
         flash('Account updated successfuly' , 'success')
         return redirect(url_for('account'))
@@ -127,6 +138,7 @@ def account():
         form.username.data = current_user.username
         form.email.data = current_user.email
         form.phone.data = current_user.phone
+        form.bio.data = current_user.bio
 
     image_file= url_for('static',filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='Account',image_file= image_file , form=form)
@@ -137,10 +149,11 @@ def account():
 @login_required
 def new_post():
     form=PostForm()
+    random_hex= secrets.token_hex(8)
     if form.validate_on_submit():
         if form.picture.data:
-            picture_file= save_design(form.picture.data)
-            designfile= save_file(form.dfile.data)
+            picture_file= save_design(form.picture.data,random_hex)
+            designfile= save_file(form.dfile.data,random_hex)
             post=Post(title=form.title.data,caption=form.caption.data, image_file=picture_file ,author=current_user,dfile=designfile)
         db.session.add(post)
         db.session.commit()
@@ -151,7 +164,9 @@ def new_post():
 def post(post_id):
     post=Post.query.get_or_404(post_id)
     orders=Order.query.filter_by(product=post).paginate()
-    return render_template('post.html',title=post.title,post=post,orders=orders)
+    gallery = Gallery.query.filter_by(product=post).paginate()
+    feedback = Feedback.query.filter_by(rate=post).paginate()
+    return render_template('post.html',title=post.title,post=post,orders=orders,gallery=gallery,feedback=feedback)
 
 @app.route("/post/<int:post_id>/share")
 def share_post(post_id):
@@ -165,9 +180,10 @@ def update_post(post_id):
     if post.author != current_user:
         abort(403)
     form = PostForm()
+    f_name , f_ext = os.path.splitext(post.picture_file.filename)
     if form.validate_on_submit():
-        picture_file= save_design(form.picture.data)
-        designfile= save_file(form.dfile.data)
+        picture_file= save_design(form.picture.data,f_name)
+        designfile= save_file(form.dfile.data,f_name)
         post.image_file=picture_file
         post.dfile= designfile
         post.title = form.title.data
@@ -180,6 +196,26 @@ def update_post(post_id):
         form.caption.data = post.caption
     return render_template('create_post.html', title='Update Post',
                            form=form, legend='Update Post',post=post)
+
+@app.route("/post/<int:post_id>/AddImage", methods=['GET', 'POST'])
+@login_required
+def Add_image(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    form = GalleryForm()
+    random_hex= secrets.token_hex(8)
+    if form.validate_on_submit():
+        for file in form.ig.data:
+            picture_file= save_design(file,random_hex)
+            gallery =Gallery(ig=picture_file ,product =post)
+            db.session.add(gallery)
+        db.session.commit()
+        flash('Pic added Successfuly' , 'success')
+        return redirect(url_for('home'))
+    return render_template('addimage.html', title='Adding to gallery',form=form,post=post)
+
+
 
 @app.route("/post/<int:post_id>/delete",methods =['POST'])
 @login_required
@@ -237,12 +273,41 @@ def order_post(post_id):
     form = OrderForm()
     author= post.author
     if form.validate_on_submit():
-        order=Order(material=form.material.data,name=form.name.data,address=form.location.data,size = form.size.data,phone=form.phone.data,color=form.color.data,qty=form.qty.data ,owner=author,product =post )
+        cash=0
+        if form.material.data =='Mug 50 LE':
+            cash= 50*form.qty.data
+        if form.material.data =='T-shirt 200LE':
+             cash= 200*form.qty.data
+        if form.material.data =='hoodi 300LE':
+             cash= 300*form.qty.data
+        order=Order(material=form.material.data,name=form.name.data,address=form.location.data,size = form.size.data,phone=form.phone.data,phone2=form.phone2.data,color=form.color.data,qty=form.qty.data ,owner=author,product =post , cash=cash)
         db.session.add(order)
         db.session.commit()
-        flash('Order placed Successfuly' , 'success')
+        flash('Order placed Successfuly & total amount is : '+cash+' L.E' , 'success')
         return redirect(url_for('home'))
     return render_template('create_order.html', title='New Order',form=form,post=post)
+
+@app.route("/post/<int:post_id>/feedback",methods =['GET','POST'])
+@login_required
+def feedback_post(post_id):
+    post=Post.query.get_or_404(post_id)
+    form = FeedbackForm()
+    cond1 = 0
+    cond1 = Feedback.query.filter_by(rate= post,critic= current_user).first()
+    if cond1:
+        flash('Already Rated' , 'warning')
+        return redirect(url_for('post', post_id = post.id))
+    else:
+        if form.validate_on_submit():
+            feedback=Feedback(score=form.score.data,cont=form.cont.data ,rate=post,critic=current_user)
+            post.scorecount +=1
+            post.scoresum = post.scoresum+form.score.data
+            db.session.add(feedback)
+            db.session.commit()
+            flash('Feedback submitted  Successfuly' , 'success')
+            return redirect(url_for('post', post_id = post.id))
+    return render_template('Feedback.html', title='Feedback',form=form,post=post)
+
 
 @app.errorhandler(404)
 def error_404(error):
@@ -257,5 +322,4 @@ def error_403(error):
 @app.errorhandler(500)
 def error_500(error):
     return render_template('500.html'), 500
-
 

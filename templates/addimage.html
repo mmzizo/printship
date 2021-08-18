@@ -1,0 +1,74 @@
+{% extends 'layout.html' %}
+{% block content %}
+<Div class="container mx-4 columns is-2 is-multiline is-three-quarters">
+    <div class="column   is-two-thirds">
+        <figure class="image is-4by3">
+            <img src="{{url_for('static', filename='design_pics/' + post.image_file)}}" alt="Placeholder image">
+        </figure>
+    </div>
+    <div class="column  is-one-third">
+        <div class="box">
+            <form action="" method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="media ">
+                    <div class="is-size-4 has-text-centered"> <b>Add Images</b></div>
+                </div>
+
+                {% if form.ig.errors %}
+                <div id="thumb-js-example" class="file is-info has-name field">
+                    <label class="file-label">
+                        {{form.ig(class="file-input",type="file")}}
+                        <span class="file-cta">
+                            <span class="file-icon">
+                                <i class="fas fa-upload"></i>
+                            </span>
+                            <span class="file-label">
+                                {{form.ig.label}}
+                            </span>
+                        </span>
+                        <span class="file-name">
+                            Thumbnail
+                        </span>
+                    </label>
+                </div>
+                {% for error in form.ig.errors %}
+                <p class="help is-danger">{{error}}</p>
+                {% endfor %}
+
+                {% else %}
+                <div id="thumb-js-example" class="file is-info has-name field">
+                    <label class="file-label">
+                        {{form.ig(class="file-input",type="file")}}
+                        <span class="file-cta">
+                            <span class="file-icon">
+                                <i class="fas fa-upload"></i>
+                            </span>
+                            <span class="file-label">
+                                {{form.ig.label}}
+                            </span>
+                        </span>
+                        <span class="file-name">
+                            thumbnail
+                        </span>
+                    </label>
+                </div>
+                {% endif %}
+                <div class="field">
+                    {{form.submit(class="button is-fullwidth is-success")}}
+                </div>
+        </div>
+        </form>
+
+    </div>
+</div>
+</Div>
+<script>
+    const thumbInput = document.querySelector('#thumb-js-example input[type=file]');
+    thumbInput.onchange = () => {
+        if (thumbInput.files.length > 0) {
+            const fileName = document.querySelector('#thumb-js-example .file-name');
+            fileName.textContent = thumbInput.files[0].name;
+        }
+    }
+</script>
+{% endblock content %}
